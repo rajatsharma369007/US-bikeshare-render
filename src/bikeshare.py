@@ -258,6 +258,25 @@ def user_stats(df, city):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-' * 40)
 
+def display_rawdata(df):
+    """Displays raw data upon user request."""
+
+    # Display raw data upon user request
+    start_loc = 0
+    end_loc = 5
+    row = ""
+
+    while True:
+        raw_data = input(
+            f"\nWould you like to see the {row} raw data?\n- Yes\n- No\n").lower()
+        if raw_data == 'yes':
+            print(df.iloc[start_loc:end_loc])
+            start_loc += 5
+            end_loc += 5
+            row = "next 5 rows of"
+        else:
+            break
+
 
 def main():
     while True:
@@ -268,6 +287,7 @@ def main():
         station_stats(df)
         trip_duration_stats(df)
         user_stats(df, city)
+        display_rawdata(df)
 
         restart = input("\nWould you like to restart? Enter yes or no.\n")
         if restart.lower() != 'yes':
