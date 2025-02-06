@@ -1,10 +1,12 @@
 """
-This is a flask application to show some insights on the US bikeshare dataset.
+Flask application to display insights on the US bikeshare dataset.
+
+This application allows users to select a city, month, and day to explore various statistics
+related to bikeshare usage. It provides visualizations of the data using Plotly.
 
 Author: Rajat Sharma
-Creation Date: 20th December 2024
+Creation Date: 20th January 2025
 """
-
 
 import json
 import plotly
@@ -17,13 +19,18 @@ from src.bikeshare import load_data
 app = Flask(__name__)
 
 
-# data variables
+# Dictionary mapping city names to their respective data file paths
 CITY_DATA = {'chicago': 'data/chicago.csv',
              'new york': 'data/new_york_city.csv',
              'washington': 'data/washington.csv'}
 
+# List of available cities
 cities = ['chicago', 'new york', 'washington']
+
+# List of available months including an option for all months
 months = ['january', 'february', 'march', 'april', 'may', 'june', 'all']
+
+# List of available days of the week including an option for all days
 days = [
     'sunday',
     'monday',
@@ -34,7 +41,7 @@ days = [
     'saturday',
     'all']
 
-
+# Load data for all cities and concatenate into a single DataFrame
 df_all = pd.concat([load_data("chicago", "all", "all"),
                     load_data("new york", "all", "all"),
                     load_data("washington", "all", "all")])
@@ -45,27 +52,26 @@ df_all = pd.concat([load_data("chicago", "all", "all"),
 def index():
     """
     Renders the main page of the bike share data explorer application.
-    This function handles GET requests. On a GET request, it renders the 
+    This function handles GET requests. On a GET request, it renders the
     form for selecting city, month, and day.
     """
 
-    # initializing the variables
+    # Initialize the variables for city, month, and day
     city = None
     month = None
     day = None
 
-    # fetch the values from the dropdown menu
+    # Fetch the values from the dropdown menu if the request method is POST
     if request.method == 'POST':
         city = request.form.get('city')
         month = request.form.get('month')
         day = request.form.get('day')
 
-
     # Grouping the data to extract the distribution of User Type
     no_of_trips = df_all.groupby("User Type").count()['Start Time']
     user_type = no_of_trips.index
 
-    # First graph
+    # Define the first graph
     graphs = [
         {
             'data': [
@@ -84,35 +90,8 @@ def index():
                     'title': "type"
                 }
             }
-        },
-
-        ### Todo: To append second graph
-        ### Checkout different graphs here: https://plotly.com/python/
-        """
-        'data': [
-                Bar(
-                    x=nlarge_names,
-                    y=nlarge_counts
-                )
-            ],
-
-            'layout': {
-                'title': 'Title',
-                'yaxis': {
-                    'title': "Count"
-                },
-                'xaxis': {
-                    'title': "Category"
-                }
-            }
-        },
-        """
+        }
     ]
-
-
-
-
-
 
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
@@ -138,10 +117,10 @@ def go():
     Handles user queries for bike share data and displays the results as a bar chart
     This function receives user selections for city, month, and day from the query parameters
     of a GET request. It then loads and filters the corresponding bike share data using the
-    `load_data` function. The function then generates a bar chart visualizing the 
+    `load_data` function. The function then generates a bar chart visualizing the
     distribution of user types
     """
-    
+
     # save user input in the following variables
     city = request.args.get('city')
     month = request.args.get('month')
@@ -154,7 +133,7 @@ def go():
     no_of_trips = df.groupby("User Type").count()['Start Time']
     user_type = no_of_trips.index
 
-    # Filtered graph
+    # Define the filtered graph
     graphs = [
         {
             'data': [
@@ -173,29 +152,7 @@ def go():
                     'title': "type"
                 }
             }
-        },
-
-        ### Todo: To append second graph
-        ### Checkout different graphs here: https://plotly.com/python/
-        """
-        'data': [
-                Bar(
-                    x=nlarge_names,
-                    y=nlarge_counts
-                )
-            ],
-
-            'layout': {
-                'title': 'Title',
-                'yaxis': {
-                    'title': "Count"
-                },
-                'xaxis': {
-                    'title': "Category"
-                }
-            }
-        },
-        """
+        }
     ]
 
     # encode plotly graphs in JSON
